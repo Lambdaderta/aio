@@ -7,7 +7,7 @@ const App = () => {
   const [theme, setTheme] = useState('dark');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const [currentView, setCurrentView] = useState('landing');
+  const [currentView, setCurrentView] = useState('landing'); 
   const [courses, setCourses] = useState([
     { 
       id: 1, 
