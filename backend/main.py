@@ -63,8 +63,8 @@ app = FastAPI(
     title=settings.app_name,
     debug=settings.debug,
     lifespan=lifespan,
-    docs_url="/docs" if settings.debug else None,  # Отключаем docs в production
-    redoc_url="/redoc" if settings.debug else None,  # Отключаем redoc в production
+    docs_url="/docs" if settings.debug else None,  
+    redoc_url="/redoc" if settings.debug else None,  
 )
 
 # Настройка CORS
@@ -98,7 +98,7 @@ async def health_check():
     try:
         # Проверяем подключение к БД
         async with db_helper.session_factory() as session:
-            result = await session.execute("SELECT 1")
+            result = await session.execute(text("SELECT 1"))
             db_value = result.scalar()
         
         return {
@@ -108,7 +108,6 @@ async def health_check():
             "database": "connected",
             "database_ping": db_value,
             "app_name": settings.app_name,
-            "version": settings.app_version
         }
     except Exception as e:
         logger.error(f"Health check failed: {e}")
@@ -160,6 +159,18 @@ async def not_found_handler(request, exc):
             "timestamp": datetime.utcnow().isoformat()
         }
     )
+
+
+# @app.websocket("/ws/pvp/{client_id}")
+# async def websocket_endpoint(websocket: WebSocket, client_id: int):
+#     await manager.connect(websocket)
+#     try:
+#         while True:
+#             data = await websocket.receive_text()
+#             # Логика игры: проверка ответа, обновление счета
+#             await manager.broadcast(f"Client #{client_id} scored!")
+#     except WebSocketDisconnect:
+#         manager.disconnect(websocket)
 
 if __name__ == "__main__":
     import uvicorn

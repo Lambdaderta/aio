@@ -7,7 +7,7 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import AsyncEngine, async_engine_from_config
 from sqlalchemy import MetaData  # Добавляем для naming convention
-
+from pgvector.sqlalchemy import Vector 
 from alembic import context
 
 # Импортируем конфиг до использования context.config
@@ -90,12 +90,14 @@ async def run_async_migrations() -> None:
 
 
 def run_migrations_online() -> None:
+    
     """Run migrations in 'online' mode."""
     try:
         asyncio.run(run_async_migrations())
     except Exception as e:
         print(f"❌ Error during migrations: {e}")
         raise
+
 
 
 # ======================

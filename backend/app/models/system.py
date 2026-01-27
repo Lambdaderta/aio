@@ -13,6 +13,12 @@ class BackgroundJob(Base):
     
     payload = Column(JSONB) # Входные данные для RunPod
     result = Column(JSONB)  # Ответ от RunPod
+
+    progress = Column(Integer, default=0)  # прогресс выполнения 0-100%
+    error_message = Column(Text, nullable=True)  # сообщение об ошибке
+    retry_count = Column(Integer, default=0)  # количество попыток
+    max_retries = Column(Integer, default=3)  # максимальное количество попыток
+    queue_name = Column(String, default="default")  # имя очереди для RabbitMQ
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
