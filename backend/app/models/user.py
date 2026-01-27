@@ -1,5 +1,6 @@
 # app/models/user.py
 from sqlalchemy import Column, Integer, String, DateTime, func, BigInteger, ForeignKey, Boolean, Enum as PyEnum
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 import enum
 from .base import Base
@@ -21,6 +22,16 @@ class User(Base):
     telegram_id = Column(BigInteger, unique=True, index=True, nullable=True)
     role = Column(String, default="user") 
     avatar_url = Column(String, nullable=True)
+
+    telegram_chat_id = Column(BigInteger, nullable=True)  # для отправки сообщений (отличается от telegram_id)
+    telegram_username = Column(String, nullable=True)  # @username
+    notification_preferences = Column(JSONB, default={
+        "email": True,
+        "telegram": True,
+        "solution_analysis": True
+    })  
+
+    last_login_at = Column(DateTime(timezone=True), nullable=True)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -41,5 +52,11 @@ class UserLimits(Base):
     plan = Column(String, default="free") 
     daily_generations_left = Column(Integer, default=5)
     reset_at = Column(DateTime(timezone=True))
+
+    course_generation_limit = Column(Integer, default=1)  # лимит на создание курсов
+    course_generation_used = Column(Integer, default=0)  # использовано созданий курсов
+    course_generation_reset_at = Column(DateTime(timezone=True), nullable=True)  # когда сбросится лимит курсов
+    ai_explanation_limit = Column(Integer, default=10)  # лимит на объяснения от ИИ
+    ai_explanation_used = Column(Integer, default=0)  # использовано объяснений
 
     user = relationship("User", back_populates="limits")

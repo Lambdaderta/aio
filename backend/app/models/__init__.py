@@ -4,7 +4,14 @@ from .user import User, UserLimits, UserRole
 from .media import File
 from .engagement import UserStats, Achievement, UserAchievement
 from .content import Course, Topic, ContentUnit, Lecture, Task
-from .learning import Enrollment, KnowledgeGraph, LearningSession, ChatMessage
+from .learning import (
+    Enrollment, 
+    KnowledgeGraph, 
+    LearningSession, 
+    ChatMessage,
+    SolutionAnalysis,    # Новая модель для анализа фото решений
+    LearningPlan        # Новая модель для персональных планов обучения
+)
 from .system import BackgroundJob, Notification
 
 # Этот список нужен, чтобы IDE и инструменты видели, что экспортируется
@@ -15,5 +22,6 @@ __all__ = [
     "UserStats", "Achievement", "UserAchievement",
     "Course", "Topic", "ContentUnit", "Lecture", "Task",
     "Enrollment", "KnowledgeGraph", "LearningSession", "ChatMessage",
+    "SolutionAnalysis", "LearningPlan",  
     "BackgroundJob", "Notification",
 ]

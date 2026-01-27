@@ -3,6 +3,8 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from .base import Base
+from pgvector.sqlalchemy import Vector
+from sqlalchemy.dialects.postgresql import ARRAY
 
 class Course(Base):
     __tablename__ = "courses"
@@ -13,6 +15,16 @@ class Course(Base):
     is_published = Column(Boolean, default=False)
     rating_avg = Column(Float, default=0.0)
     origin_type = Column(String, default="generated") # manual / generated
+
+    source_type = Column(String, default="user_generated")  # "user_generated", "pdf_upload", "request"
+    source_data = Column(JSONB, nullable=True)  # оригинальные данные запроса
+    is_verified = Column(Boolean, default=False)  # проверенный админом
+    embedding = Column(Vector(1536), nullable=True)  # для векторного поиска
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=True)  # кто создал курс
+    rating_count = Column(Integer, default=0)  # количество оценок (вместо rating_avg который уже есть)
+
+    # Связи
+    creator = relationship("User", foreign_keys=[created_by])
 
     topics = relationship("Topic", back_populates="course")
 
@@ -65,5 +77,11 @@ class Task(Base):
     # JSONB идеален для Postgres (храним структуру вопроса и валидацию)
     content = Column(JSONB, nullable=False) # {question: "...", options: []}
     validation = Column(JSONB, nullable=False) # {correct_answer: "A"}
+
+    difficulty = Column(Integer, default=1)  # 1-5 уровень сложности
+    explanation = Column(Text, nullable=True) 
+    tags = Column(ARRAY(String), nullable=True)  # ['math', 'algebra']
+    requires_ai_check = Column(Boolean, default=False)  # нужно ли проверять ИИ
+    file_upload_allowed = Column(Boolean, default=False)  # можно ли прикреплять файлы
 
     unit = relationship("ContentUnit", back_populates="task")

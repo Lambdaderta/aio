@@ -1,5 +1,6 @@
 # app/models/learning.py
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, func, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, func, Text, Boolean
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -52,3 +53,39 @@ class ChatMessage(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     session = relationship("LearningSession", back_populates="messages")
+
+
+class SolutionAnalysis(Base):
+    """Анализ фото решений от пользователей"""
+    __tablename__ = "solution_analyses"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
+    image_file_id = Column(Integer, ForeignKey("files.id"), nullable=False)  # фото решения
+    analysis_result = Column(JSONB, nullable=True)  # результат анализа ИИ
+    status = Column(String, default="pending")  # "pending", "completed", "error"
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+
+    # Связи
+    user = relationship("User")
+    task = relationship("Task")
+    image_file = relationship("File")
+
+
+class LearningPlan(Base):
+    """Персональные планы обучения для пользователей"""
+    __tablename__ = "learning_plans"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    name = Column(String, nullable=False)  # название плана
+    description = Column(Text, nullable=True)  # описание плана
+    courses = Column(JSONB, nullable=False)  # [{"course_id": 1, "order": 1, "reason": "..."}, ...]
+    is_active = Column(Boolean, default=True)  # активен ли план
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Связь
+    user = relationship("User")
